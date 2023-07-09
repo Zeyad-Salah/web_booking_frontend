@@ -1,0 +1,148 @@
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import axios from "axios";
+import axiosClient from "../../services/axiosClient";
+import { differenceInDays } from "date-fns";
+
+import ActivityIndicator from "../../components/CommonComponents/ActivityIndicator";
+import CustomModal from "../../components/CommonComponents/Modal";
+import Card from "../micro/Card";
+import useFetch from "../../Hooks/useFetch";
+import { BASE_URL } from "../../utils/config.js";
+import {Col} from "reactstrap";
+
+
+const CardList = ({budget}) => {
+    //const [loading, setLoading] = 
+    const [cities, setCities] = useState([])
+    const [loading, setLoading] = useState(false);
+
+    const [batchCalc, setBatchCalc] = useState(false);
+    const [days, setDays] = useState(null)
+    const [city, setCity] = useState(null)
+    const [tours, setTours] = useState([]);
+    const [error, setError] = useState(null);
+
+    const { data: Tours, setData } = useFetch(`${BASE_URL}/tours`);
+    const { data: featuredTours} = useFetch(`${BASE_URL}/tours/search/getFeaturedTours`);
+
+    console.log(Tours);
+    console.log(featuredTours);
+
+    useEffect(() => {
+        setLoading(true);
+        setError(null);
+        // if (date && budget && (date.startDate !== null && date.endDate !== null)) {
+        //     const numbers_of_days = differenceInDays(new Date(date.endDate), new Date(date.startDate))
+        //     const total_budget = parseInt(budget) / numbers_of_days
+        //     axiosClient.get(`${process.env.REACT_APP_BACKEND_URL}/tours/search/getTourBySearch?price=${total_budget}`).then((res) => {
+        //         setBatchCalc(true)
+        //         setDays(numbers_of_days)
+        //         setCities(res.data)
+        //         setLoading(false)
+        //       }).catch((err) => {
+        //         setLoading(true)
+        //       })
+        // }
+
+        // else if ((date != null && date.startDate != null && date.endDate != null) && (!budget || budget <= 0)) {
+        //     const numbers_of_days = differenceInDays(new Date(date.endDate), new Date(date.startDate))
+        //     axiosClient.get(`${process.env.REACT_APP_BACKEND_URL}/tours`).then((res) => {
+        //         setCities(res.data)
+        //         setLoading(false)
+        //         setBatchCalc(true)
+        //         setDays(numbers_of_days)
+        //       }).catch((err) => {
+        //     })        
+        // }
+
+        // if(budget) {
+        //     axios.get(`${process.env.REACT_APP_BACKEND_URL}/tours/search/getTourBySearch?price=${budget}`).then((res) => {
+        //         setTours(res.data);
+        //         setLoading(false);
+        //       });
+        // }
+        axios  
+      //.get(`${process.env.REACT_APP_BACKEND_URL}/tours/search?price=${budget}`)    
+      .get(`${BASE_URL}/tours`)    
+      .then((res) => {        
+        setTours(res.data);      
+        setLoading(false);  
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);   
+      });
+
+        // else {
+        //     axiosClient.get(`${process.env.REACT_APP_BACKEND_URL}/trip/countries`).then((res) => {
+        //         setCities(res.data)
+        //         setLoading(false)
+        //         setBatchCalc(false)
+        //       }).catch((err) => {
+        //       })
+        // }
+
+    }, []);
+
+    //if (error) return <h3>{error}</h3>;
+    
+    
+    // return (
+    //     (loading && cities?.length < 0) ? <ActivityIndicator loading={loading} /> : <>
+
+    //         <CustomModal
+    //             city={city}
+    //         />
+
+    //         <CardContainer className="grid grid-cols-12">
+    //             {cities.map((city, i) => ((
+    //                 <div className="col-span-12 md:col-span-6 lg:col-span-4 xl:col-span-3">
+    //                     <Card key={i} city={city} days={days} batch={batchCalc} setCity={setCity} />
+    //                 </div>
+    //             )))}
+    //         </CardContainer>
+
+    //         <div
+    //             style={{
+    //             display: "flex",
+    //             width: "100%",
+    //             justifyContent: "center",
+    //             alignItems: "center",
+    //             }}
+    //         >
+    //             <ActivityIndicator loading={loading} />
+    //         </div>
+    //     </>)
+    // return (
+    //     <>
+    //       {loading ? (
+    //         <ActivityIndicator loading={loading} />
+    //       ) : (
+    //         <CardContainer className="grid grid-cols-12">
+    //           {tours.map((tour, index) => (
+    //             <Card key={index} tour={tour} />
+    //           ))}
+    //         </CardContainer>
+    //       )}
+    //     </>
+    //   );
+    return (
+        <>
+        {featuredTours?.map(tour => (
+          <Col lg="3" className="mb-4" key={tour._id}>
+            <Card tour={tour} />
+          </Col>
+        ))}
+        </>
+      );
+}
+
+const CardContainer = styled.div`
+  // display: grid;
+  grid-gap: 20px;
+  margin: 0px 10px;
+  margin-top: 20px;
+`;
+
+export default CardList
